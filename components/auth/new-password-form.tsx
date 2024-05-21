@@ -2,37 +2,39 @@
 
 import * as z from 'zod';
 import { useForm } from 'react-hook-form';
-import { useEffect, useState, useTransition } from 'react';
+import { useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { ResetSchema } from '@/schemas';
+import { NewPasswordSchema } from '@/schemas';
 import { CardWrapper } from './card-wrapper';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/form-error';
 import { FormSuccess } from '@/components/form-success';
-import { reset } from '@/actions/reset';
+import { newPassword } from '@/actions/new-password';
+import { useSearchParams } from 'next/navigation';
 
-export const ResetForm = () => {
+export const NewPasswordForm = () => {
   const [error, setError] = useState<string | undefined>('');
   const [success, setSuccess] = useState<string | undefined>('');
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {}, []);
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
 
-  const form = useForm<z.infer<typeof ResetSchema>>({
-    resolver: zodResolver(ResetSchema),
+  const form = useForm<z.infer<typeof NewPasswordSchema>>({
+    resolver: zodResolver(NewPasswordSchema),
     defaultValues: {
-      email: '',
+      password: '',
     },
   });
 
-  const onSubmit = (values: z.infer<typeof ResetSchema>) => {
+  const onSubmit = (values: z.infer<typeof NewPasswordSchema>) => {
     setError('');
     setSuccess('');
 
     startTransition(() => {
-      reset(values).then((data) => {
+      newPassword(values, token).then((data) => {
         setError(data?.error);
         setSuccess(data?.success);
       });
@@ -40,18 +42,18 @@ export const ResetForm = () => {
   };
 
   return (
-    <CardWrapper headerLabel="Forgot your password?" backButtonLabel="Back to login" backButtonHref="/auth/login">
+    <CardWrapper headerLabel="Enter a new password" backButtonLabel="Back to login" backButtonHref="/auth/login">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <div className="space-y-4">
             <FormField
               control={form.control}
-              name="email"
+              name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Password</FormLabel>
                   <FormControl>
-                    <Input {...field} disabled={isPending} placeholder="john.doe@example.com" type="email" />
+                    <Input {...field} disabled={isPending} placeholder="******" type="password" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -63,7 +65,7 @@ export const ResetForm = () => {
           <FormSuccess message={success} />
 
           <Button disabled={isPending} type="submit" className="w-full">
-            Send reset email
+            Reset password
           </Button>
         </form>
       </Form>

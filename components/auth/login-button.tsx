@@ -13,7 +13,6 @@ export const LoginButton = ({ children, mode = 'redirect', asChild }: LoginButto
 
   const onClick = () => {
     router.push('/auth/login');
-    console.log('Login button clicked');
   };
 
   return (
