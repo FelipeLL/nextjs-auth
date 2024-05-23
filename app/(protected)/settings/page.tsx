@@ -7,8 +7,7 @@ const SettingsPage = () => {
   const user = useCurrentUser();
 
   return (
-    <div>
-      <p>{JSON.stringify(user)}</p>
+    <div className="p-10 rounded-xl bg-white">
       <button onClick={() => logout()} type="submit">
         Sign out
       </button>
